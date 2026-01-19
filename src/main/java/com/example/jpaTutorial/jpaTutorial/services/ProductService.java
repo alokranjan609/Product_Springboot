@@ -29,6 +29,7 @@ public class ProductService {
             throw new IllegalArgumentException("Product with this SKU already exists");
         }
         ProductEntity product=modelMapper.map(request, ProductEntity.class);
+        product.setCreatedAt(LocalDate.now());
         ProductEntity producttoreturn=productRepository.save(product);
         return modelMapper.map(producttoreturn, ProductResponseDTO.class);
 
@@ -56,17 +57,17 @@ public class ProductService {
 
     /* UPDATE */
     public ProductResponseDTO updateProduct(Long id, ProductRequestDTO request) {
+        ProductEntity product=modelMapper.map(request,ProductEntity.class);
+        if(!productRepository.existsById(id))
+            throw new RuntimeException("Product not found");
 
-        ProductEntity product = productRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Product not found"));
-
-        product.setTitle(request.getTitle());
-        product.setPrice(request.getPrice());
-        product.setQuantity(request.getQuantity());
+        product.setId(id);
         product.setUpdatedAt(LocalDate.now());
 
-        return modelMapper.map(product, ProductResponseDTO.class);
+
+        ProductEntity savedPProduct=productRepository.save(product);
+
+        return modelMapper.map(savedPProduct, ProductResponseDTO.class);
     }
 
     /* DELETE */
