@@ -3,6 +3,7 @@ package com.example.jpaTutorial.jpaTutorial.services;
 import com.example.jpaTutorial.jpaTutorial.dto.ProductRequestDTO;
 import com.example.jpaTutorial.jpaTutorial.dto.ProductResponseDTO;
 import com.example.jpaTutorial.jpaTutorial.entities.ProductEntity;
+import com.example.jpaTutorial.jpaTutorial.exceptions.ResourceNotFoundException;
 import com.example.jpaTutorial.jpaTutorial.repository.ProductRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,8 @@ public class ProductService {
     public ProductResponseDTO getProductById(Long id) {
         ProductEntity product = productRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Product not found"));
+                        new ResourceNotFoundException(
+                                "Product not found with id: " + id));
 
         return modelMapper.map(product, ProductResponseDTO.class);
     }
@@ -59,8 +61,7 @@ public class ProductService {
     public ProductResponseDTO updateProduct(Long id, ProductRequestDTO request) {
         ProductEntity product=modelMapper.map(request,ProductEntity.class);
         if(!productRepository.existsById(id))
-            throw new RuntimeException("Product not found");
-
+            throw new ResourceNotFoundException("Product not found with id: " + id);
         product.setId(id);
         product.setUpdatedAt(LocalDate.now());
 
@@ -74,7 +75,7 @@ public class ProductService {
     public void deleteProduct(Long id) {
 
         if (!productRepository.existsById(id)) {
-            throw new RuntimeException("Product not found");
+            throw new ResourceNotFoundException("Product not found with id: " + id);
         }
         productRepository.deleteById(id);
     }
