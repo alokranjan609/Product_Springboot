@@ -73,12 +73,14 @@ public class GlobalHandlerException {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgument(
+    public ResponseEntity<ApiResponse<?>> handleIllegalArgument(
             IllegalArgumentException ex) {
 
-        return ResponseEntity
-                .badRequest()
-                .body(ex.getMessage());
+        ApiError apiError=ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .message(ex.getMessage())
+                .build();
+        return buildErrorResponseEntity(apiError);
     }
 
     private ResponseEntity<ApiResponse<?>> buildErrorResponseEntity(ApiError apiError) {
